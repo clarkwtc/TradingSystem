@@ -3,6 +3,7 @@ package com.app.trading.domain;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TradingSystem {
     private final List<User> users;
@@ -19,7 +20,7 @@ public class TradingSystem {
     }
 
     public void addUser(String name, String email, String address){
-        User user = new User(name, email, address);
+        User user = new User(UUID.randomUUID(), name, email, address);
         giveReward(user);
         user.setTradingSystem(this);
         users.add(user);

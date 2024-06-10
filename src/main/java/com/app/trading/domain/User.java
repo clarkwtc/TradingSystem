@@ -1,12 +1,10 @@
 package com.app.trading.domain;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class User {
+    private final UUID id;
     private final String name;
     private final String email;
     private final String address;
@@ -14,7 +12,17 @@ public class User {
     private final List<Transaction> transactionHistory;
     private TradingSystem tradingSystem;
 
+    public User(UUID id, String name, String email, String address) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.address = address;
+        this.balances = new HashMap<>();
+        this.transactionHistory = new ArrayList<>();
+    }
+
     public User(String name, String email, String address) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.email = email;
         this.address = address;
@@ -24,6 +32,10 @@ public class User {
 
     public void setTradingSystem(TradingSystem tradingSystem) {
         this.tradingSystem = tradingSystem;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public String getName() {
@@ -49,17 +61,6 @@ public class User {
     private void transaction(BigDecimal price, BigDecimal amount, Currency currency, TransactionType transactionType){
         Transaction transaction = new Transaction(price, amount, currency, transactionType);
         transactionHistory.add(transaction);
-
-//        if (!balances.containsKey(currency)){
-//            balances.put(currency, new BigDecimal(0));
-//        }
-//
-//        if (TransactionType.BUY.equals(transactionType) || TransactionType.REWARD.equals(transactionType)){
-//            balances.put(currency, balances.get(currency).add(transaction.getPrice().multiply(transaction.getValue())));
-//        }
-//        else if(TransactionType.SELL.equals(transactionType)){
-//            balances.put(currency, balances.get(currency).subtract(transaction.getPrice().multiply(transaction.getValue())));
-//        }
     }
 
     public void deposit(BigDecimal price, BigDecimal amount, Currency currency, TransactionType transactionType){
