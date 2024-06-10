@@ -1,11 +1,15 @@
 package com.app.trading.infrastructure.endpoints;
 
 import com.app.trading.application.CreateUserUseCase;
+import com.app.trading.application.TransactionHistoryUseCase;
 import com.app.trading.application.UserTransactionUseCase;
 import com.app.trading.application.parameters.CreateUserUseCaseParameter;
+import com.app.trading.application.parameters.TransactionHistoryParameter;
 import com.app.trading.application.parameters.UserTransactionParameter;
 import com.app.trading.domain.events.CreateUserEvent;;
+import com.app.trading.domain.events.TransactionHistoryEvent;
 import com.app.trading.infrastructure.dto.CreateUserDTO;
+import com.app.trading.infrastructure.dto.TransactionHistoryDTO;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,8 @@ public class UserController {
     CreateUserUseCase createUserUseCase;
     @Autowired
     UserTransactionUseCase userTransactionUseCase;
+    @Autowired
+    TransactionHistoryUseCase transactionHistoryUseCase;
 
     @Getter
     @Setter
@@ -51,5 +57,12 @@ public class UserController {
         UserTransactionParameter userTransactionParameter = new UserTransactionParameter(UUID.fromString(id), BigDecimal.valueOf(transactionRequest.getAmount()), transactionRequest.getAction());
         userTransactionUseCase.execute(userTransactionParameter);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{id}/transactionHistory")
+    public ResponseEntity<TransactionHistoryDTO> transactionHistory(@PathVariable String id){
+        TransactionHistoryParameter transactionHistoryParameter = new TransactionHistoryParameter(UUID.fromString(id));
+        TransactionHistoryEvent event = transactionHistoryUseCase.execute(transactionHistoryParameter);
+        return new ResponseEntity<>(TransactionHistoryDTO.toDTO(event), HttpStatus.OK);
     }
 }

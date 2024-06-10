@@ -5,6 +5,8 @@ import com.app.trading.domain.Transaction;
 import com.app.trading.domain.TransactionType;
 import com.app.trading.domain.User;
 import com.app.trading.infrastructure.dto.CreateUserDTO;
+import com.app.trading.infrastructure.dto.TransactionDTO;
+import com.app.trading.infrastructure.dto.TransactionHistoryDTO;
 import com.app.trading.infrastructure.endpoints.UserController;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -114,5 +116,31 @@ public class UserControllerTestCase {
         Assertions.assertEquals(2, transactions.size());
         Assertions.assertEquals(new BigDecimal("900.0"), user.getBalances(Currency.USD));
         Assertions.assertEquals(new BigDecimal("100.0"), user.getBalances(Currency.BTC));
+    }
+
+    @Test
+    public void transactionHistory() {
+        // Given
+        User user = new User("clark", "cc@gmail.com", UUID.randomUUID().toString());
+        userRepository.save(user);
+        transactionRepository.save(user.getId(), new Transaction(new BigDecimal(1), new BigDecimal(1000), Currency.USD, TransactionType.REWARD));
+
+        RequestSpecification request = given()
+                .pathParam("userId", user.getId().toString());
+
+        // When
+        Response response = request.when()
+                .get("/api/users/{userId}/transactionHistory");
+
+        // Then
+        response.then().statusCode(200);
+        TransactionHistoryDTO transactionHistoryDTO = response.body().as(TransactionHistoryDTO.class);
+        Assertions.assertEquals(1, transactionHistoryDTO.transactions.size());
+        for (TransactionDTO transactionDTO : transactionHistoryDTO.transactions) {
+            Assertions.assertEquals(new BigDecimal(1), transactionDTO.price);
+            Assertions.assertEquals(new BigDecimal(1000), transactionDTO.value);
+            Assertions.assertEquals(Currency.USD, transactionDTO.currency);
+            Assertions.assertEquals(TransactionType.REWARD, transactionDTO.transactionType);
+        }
     }
 }
