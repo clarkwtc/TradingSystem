@@ -1,9 +1,9 @@
 package com.app.trading.infrastructure.endpoints;
 
-import com.app.trading.application.CreateUseCase;
-import com.app.trading.application.parameters.CreateUseCaseParameter;
+import com.app.trading.application.CreateUserUseCase;
+import com.app.trading.application.parameters.CreateUserUseCaseParameter;
 import com.app.trading.domain.events.CreateUserEvent;
-import com.app.trading.infrastructure.CreateUserDTO;
+import com.app.trading.infrastructure.dto.CreateUserDTO;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
-    CreateUseCase createUseCase;
+    CreateUserUseCase createUserUseCase;
 
     @Getter
     @Setter
@@ -28,8 +28,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<CreateUserDTO> createUser(@RequestBody CreateRequest request){
-        CreateUseCaseParameter createUseCaseParameter = new CreateUseCaseParameter(request.name, request.email, request.address);
-        CreateUserEvent event = createUseCase.execute(createUseCaseParameter);
+        CreateUserUseCaseParameter createUserUseCaseParameter = new CreateUserUseCaseParameter(request.name, request.email, request.address);
+        CreateUserEvent event = createUserUseCase.execute(createUserUseCaseParameter);
         return new ResponseEntity<>(CreateUserDTO.toDTO(event), HttpStatus.CREATED);
     }
 }

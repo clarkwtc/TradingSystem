@@ -15,14 +15,14 @@ public class TradingSystemTestCase {
     }
 
     @Test
-    public void addUser(){
+    public void addNewUser(){
         // Given
         String name = "clark";
         String email = "cc@gmail.com";
         String address = UUID.randomUUID().toString();
 
         // When
-        tradingSystem.addUser(name, email, address);
+        tradingSystem.addNewUser(name, email, address);
 
         // Then
         Assertions.assertEquals(1, tradingSystem.getUsers().size());
@@ -40,7 +40,7 @@ public class TradingSystemTestCase {
         String name = "clark";
         String email = "cc@gmail.com";
         String address = "TW";
-        tradingSystem.addUser(name, email, address);
+        tradingSystem.addNewUser(name, email, address);
         User user = tradingSystem.getUsers().get(0);
 
         // When

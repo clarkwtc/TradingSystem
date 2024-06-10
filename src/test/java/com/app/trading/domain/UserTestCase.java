@@ -13,7 +13,7 @@ public class UserTestCase {
     @BeforeEach
     void setUp(){
         this.tradingSystem = new TradingSystem();
-        tradingSystem.addUser("clark", "cc@email.com", UUID.randomUUID().toString());
+        tradingSystem.addNewUser("clark", "cc@email.com", UUID.randomUUID().toString());
     }
 
     @Test
