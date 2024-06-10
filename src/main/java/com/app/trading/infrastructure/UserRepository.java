@@ -30,9 +30,9 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public User findById(UUID id) {
-
-        return null;
+    public Optional<User> findById(UUID id) {
+        Optional<UserEntity> entity = repository.findById(id.toString());
+        return entity.map(UserEntity::toDomain);
     }
 
     @Override

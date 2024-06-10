@@ -1,8 +1,10 @@
 package com.app.trading.infrastructure.endpoints;
 
 import com.app.trading.application.CreateUserUseCase;
+import com.app.trading.application.UserTransactionUseCase;
 import com.app.trading.application.parameters.CreateUserUseCaseParameter;
-import com.app.trading.domain.events.CreateUserEvent;
+import com.app.trading.application.parameters.UserTransactionParameter;
+import com.app.trading.domain.events.CreateUserEvent;;
 import com.app.trading.infrastructure.dto.CreateUserDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
     CreateUserUseCase createUserUseCase;
+    @Autowired
+    UserTransactionUseCase userTransactionUseCase;
 
     @Getter
     @Setter
@@ -31,5 +37,19 @@ public class UserController {
         CreateUserUseCaseParameter createUserUseCaseParameter = new CreateUserUseCaseParameter(request.name, request.email, request.address);
         CreateUserEvent event = createUserUseCase.execute(createUserUseCaseParameter);
         return new ResponseEntity<>(CreateUserDTO.toDTO(event), HttpStatus.CREATED);
+    }
+
+    @Getter
+    @Setter
+    public static class TransactionRequest {
+        private Double amount;
+        private String action;
+    }
+
+    @PostMapping("/{id}/transaction")
+    public ResponseEntity<Object> transaction(@PathVariable String id, @RequestBody TransactionRequest transactionRequest){
+        UserTransactionParameter userTransactionParameter = new UserTransactionParameter(UUID.fromString(id), BigDecimal.valueOf(transactionRequest.getAmount()), transactionRequest.getAction());
+        userTransactionUseCase.execute(userTransactionParameter);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

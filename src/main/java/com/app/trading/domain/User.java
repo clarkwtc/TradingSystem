@@ -9,7 +9,7 @@ public class User {
     private final String email;
     private final String address;
     private final Map<Currency, BigDecimal> balances;
-    private final List<Transaction> transactionHistory;
+    private List<Transaction> transactionHistory;
     private TradingSystem tradingSystem;
 
     public User(UUID id, String name, String email, String address) {
@@ -32,6 +32,27 @@ public class User {
 
     public void setTradingSystem(TradingSystem tradingSystem) {
         this.tradingSystem = tradingSystem;
+    }
+
+    public void setBalances(){
+        this.transactionHistory.forEach(transaction -> {
+            if (TransactionType.BUY.equals(transaction.getTransactionType())){
+                addBalance(transaction.getCurrency(), transaction.getValue(), transaction.getPrice());
+                subBalance(Currency.USD, new BigDecimal(1), transaction.getValue().multiply(transaction.getPrice()));
+            }
+            else if (TransactionType.SELL.equals(transaction.getTransactionType())){
+                subBalance(transaction.getCurrency(), transaction.getValue(), transaction.getPrice());
+                addBalance(Currency.USD, new BigDecimal(1), transaction.getValue().multiply(transaction.getPrice()));
+            }
+            else if(TransactionType.REWARD.equals(transaction.getTransactionType())){
+                addBalance(Currency.USD, new BigDecimal(1), transaction.getValue().multiply(transaction.getPrice()));
+            }
+        });
+    }
+
+    public void setTransactionHistory(List<Transaction> transactionHistory) {
+        this.transactionHistory = transactionHistory;
+        setBalances();
     }
 
     public UUID getId() {
