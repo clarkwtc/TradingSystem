@@ -3,6 +3,7 @@ package com.app.trading.application;
 import com.app.trading.application.parameters.UserTransactionParameter;
 import com.app.trading.domain.*;
 import com.app.trading.domain.events.TransactionEvent;
+import com.app.trading.infrastructure.StartupTimeBean;
 import com.app.trading.infrastructure.TransactionRepository;
 import com.app.trading.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,14 @@ public class UserTransactionUseCase implements IUseCase<UserTransactionParameter
     UserRepository userRepository;
     @Autowired
     TransactionRepository transactionRepository;
+    @Autowired
+    private StartupTimeBean startupTimeBean;
 
     @Override
     public TransactionEvent execute(UserTransactionParameter parameter) {
         User user = findUser(parameter.userId());
+        TradingSystem tradingSystem = new TradingSystem(startupTimeBean.getStartupTime());
+        tradingSystem.addUser(user);
         Transaction transaction = userTransaction(user, parameter.amount(), parameter.action());
         return new TransactionEvent(transaction);
     }
@@ -46,7 +51,7 @@ public class UserTransactionUseCase implements IUseCase<UserTransactionParameter
             throw new RuntimeException();
         }
 
-        TradingSystem tradingSystem = new TradingSystem();
+        TradingSystem tradingSystem = new TradingSystem(startupTimeBean.getStartupTime());
         tradingSystem.addUser(optionalUser.get());
         User user = tradingSystem.getUsers().get(0);
         user.setTransactionHistory(transactions);

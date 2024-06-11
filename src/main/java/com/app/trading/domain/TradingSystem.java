@@ -1,21 +1,21 @@
 package com.app.trading.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TradingSystem {
     private final List<User> users;
-    private final PricingSystem pricingSystem;
+    private final PricingAlgorithm pricingAlgorithm;
 
-    public TradingSystem() {
+    public TradingSystem(LocalDateTime startupTime) {
         this.users = new ArrayList<>();
-        this.pricingSystem = new PricingSystem(new BigDecimal(100), Currency.BTC);
-        pricingSystem.start();
+        this.pricingAlgorithm = new PricingAlgorithm(new BigDecimal("100.0"), Currency.BTC, startupTime);
     }
 
-    public PricingSystem getPricingSystem() {
-        return pricingSystem;
+    public PricingAlgorithm getPricingSystem() {
+        return pricingAlgorithm;
     }
 
     public void addNewUser(String name, String email, String address){
@@ -34,7 +34,7 @@ public class TradingSystem {
     }
 
     private void giveReward(User user){
-        user.deposit(new BigDecimal(1), new BigDecimal(1000), Currency.USD, TransactionType.REWARD);
+        user.deposit(new BigDecimal("1.0"), new BigDecimal("1000.0"), Currency.USD, TransactionType.REWARD);
     }
 
     public void deleteUser(String address){

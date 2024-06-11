@@ -5,13 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class TradingSystemTestCase {
     private TradingSystem tradingSystem;
     @BeforeEach
     void setUp() {
-        this.tradingSystem = new TradingSystem();
+        this.tradingSystem = new TradingSystem(LocalDateTime.now());
     }
 
     @Test
@@ -31,7 +32,7 @@ public class TradingSystemTestCase {
         Assertions.assertEquals(email, user.getEmail());
         Assertions.assertEquals(address, user.getAddress());
         Assertions.assertEquals(1, user.getTransactionHistory().size());
-        Assertions.assertEquals(new BigDecimal(1000), user.getBalances(Currency.USD));
+        Assertions.assertEquals(new BigDecimal("1000.00"), user.getBalances(Currency.USD));
     }
 
     @Test

@@ -24,6 +24,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -84,7 +85,7 @@ public class UserControllerTestCase {
         Assertions.assertEquals(name, user.getName());
         Assertions.assertEquals(email, user.getEmail());
         Assertions.assertEquals(address, user.getAddress());
-        Assertions.assertEquals(new BigDecimal(1000), user.getBalances(Currency.USD));
+        Assertions.assertEquals(new BigDecimal("1000.000"), user.getBalances(Currency.USD));
     }
 
     @Test
@@ -114,8 +115,8 @@ public class UserControllerTestCase {
         List<Transaction> transactions = transactionRepository.findByUserId(user.getId());
         user.setTransactionHistory(transactions);
         Assertions.assertEquals(2, transactions.size());
-        Assertions.assertEquals(new BigDecimal("900.0"), user.getBalances(Currency.USD));
-        Assertions.assertEquals(new BigDecimal("100.0"), user.getBalances(Currency.BTC));
+        Assertions.assertEquals(new BigDecimal("900.00"), user.getBalances(Currency.USD).setScale(2, RoundingMode.HALF_UP));
+        Assertions.assertEquals(new BigDecimal("100.00"), user.getBalances(Currency.BTC));
     }
 
     @Test
@@ -137,8 +138,8 @@ public class UserControllerTestCase {
         TransactionHistoryDTO transactionHistoryDTO = response.body().as(TransactionHistoryDTO.class);
         Assertions.assertEquals(1, transactionHistoryDTO.transactions.size());
         for (TransactionDTO transactionDTO : transactionHistoryDTO.transactions) {
-            Assertions.assertEquals(new BigDecimal(1), transactionDTO.price);
-            Assertions.assertEquals(new BigDecimal(1000), transactionDTO.value);
+            Assertions.assertEquals(new BigDecimal("1.00"), transactionDTO.price);
+            Assertions.assertEquals(new BigDecimal("1000.00"), transactionDTO.value);
             Assertions.assertEquals(Currency.USD, transactionDTO.currency);
             Assertions.assertEquals(TransactionType.REWARD, transactionDTO.transactionType);
         }

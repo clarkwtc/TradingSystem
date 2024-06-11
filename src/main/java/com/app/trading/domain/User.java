@@ -38,14 +38,14 @@ public class User {
         this.transactionHistory.forEach(transaction -> {
             if (TransactionType.BUY.equals(transaction.getTransactionType())){
                 addBalance(transaction.getCurrency(), transaction.getValue(), transaction.getPrice());
-                subBalance(Currency.USD, new BigDecimal(1), transaction.getValue().multiply(transaction.getPrice()));
+                subBalance(Currency.USD, new BigDecimal("1.0"), transaction.getValue().multiply(transaction.getPrice()));
             }
             else if (TransactionType.SELL.equals(transaction.getTransactionType())){
                 subBalance(transaction.getCurrency(), transaction.getValue(), transaction.getPrice());
-                addBalance(Currency.USD, new BigDecimal(1), transaction.getValue().multiply(transaction.getPrice()));
+                addBalance(Currency.USD, new BigDecimal("1.0"), transaction.getValue().multiply(transaction.getPrice()));
             }
             else if(TransactionType.REWARD.equals(transaction.getTransactionType())){
-                addBalance(Currency.USD, new BigDecimal(1), transaction.getValue().multiply(transaction.getPrice()));
+                addBalance(Currency.USD, new BigDecimal("1.0"), transaction.getValue().multiply(transaction.getPrice()));
             }
         });
     }
@@ -88,7 +88,7 @@ public class User {
         transaction(price, amount, currency, transactionType);
 
         if (!balances.containsKey(currency)){
-            balances.put(currency, new BigDecimal(0));
+            balances.put(currency, new BigDecimal("0.0"));
         }
 
         balances.put(currency, balances.get(currency).add(price.multiply(amount)));
@@ -96,7 +96,7 @@ public class User {
 
     private void addBalance(Currency currency, BigDecimal price, BigDecimal amount){
         if (!balances.containsKey(currency)){
-            balances.put(currency, new BigDecimal(0));
+            balances.put(currency, new BigDecimal("0.0"));
         }
 
         balances.put(currency, balances.get(currency).add(price.multiply(amount)));
@@ -104,30 +104,30 @@ public class User {
 
     private void subBalance(Currency currency, BigDecimal price, BigDecimal amount){
         if (!balances.containsKey(currency)){
-            balances.put(currency, new BigDecimal(0));
+            balances.put(currency, new BigDecimal("0.0"));
         }
 
         balances.put(currency, balances.get(currency).subtract(price.multiply(amount)));
     }
 
     public void buy(BigDecimal amount){
-        BigDecimal marketPrice = tradingSystem.getPricingSystem().getPrice();
+        BigDecimal marketPrice = tradingSystem.getPricingSystem().getLatestPrice();
         BigDecimal totalValue = marketPrice.multiply(amount);
         if (balances.containsKey(Currency.USD) && balances.get(Currency.USD).compareTo(totalValue) != -1){
             transaction(marketPrice, amount, Currency.BTC, TransactionType.BUY);
 
             addBalance(Currency.BTC, marketPrice, amount);
-            subBalance(Currency.USD, new BigDecimal(1), totalValue);
+            subBalance(Currency.USD, new BigDecimal("1.0"), totalValue);
         }
     }
 
     public void sell(BigDecimal amount){
-        BigDecimal marketPrice = tradingSystem.getPricingSystem().getPrice();
+        BigDecimal marketPrice = tradingSystem.getPricingSystem().getLatestPrice();
         BigDecimal totalValue = marketPrice.multiply(amount);
         if (balances.containsKey(Currency.BTC) && balances.get(Currency.BTC).compareTo(totalValue) != -1){
             transaction(marketPrice, amount, Currency.BTC, TransactionType.SELL);
 
-            addBalance(Currency.USD, new BigDecimal(1), totalValue);
+            addBalance(Currency.USD, new BigDecimal("1.0"), totalValue);
             subBalance(Currency.BTC, marketPrice, amount);
         }
     }
