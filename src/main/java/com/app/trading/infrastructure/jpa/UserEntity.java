@@ -1,8 +1,7 @@
 package com.app.trading.infrastructure.jpa;
 
 import com.app.trading.domain.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name="users")
 public class UserEntity {
     @Id
     private String id;

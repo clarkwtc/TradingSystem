@@ -1,12 +1,11 @@
-package com.app.trading.infrastructure.jpa;
+package com.app.trading.infrastructure.mongo;
 
 import com.app.trading.domain.Currency;
 import com.app.trading.domain.Transaction;
 import com.app.trading.domain.TransactionType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,9 +15,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name="transaction")
-public class TransactionEntity {
+@Document(collection="transaction")
+public class TransactionCollection {
     @Id
     private String id;
     private String userId;
@@ -27,12 +25,12 @@ public class TransactionEntity {
     private String currency;
     private String type;
 
-    public static Transaction toDomain(TransactionEntity entity){
-        return new Transaction(new BigDecimal(entity.getPrice()), new BigDecimal(entity.getAmount()), Currency.valueOf(entity.getCurrency()), TransactionType.valueOf(entity.getType()));
+    public static Transaction toDomain(TransactionCollection collection){
+        return new Transaction(new BigDecimal(collection.getPrice()), new BigDecimal(collection.getAmount()), Currency.valueOf(collection.getCurrency()), TransactionType.valueOf(collection.getType()));
     }
 
-    public static TransactionEntity toEntity(UUID userId, Transaction transaction){
-        return TransactionEntity.builder()
+    public static TransactionCollection toEntity(UUID userId, Transaction transaction){
+        return TransactionCollection.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(userId.toString())
                 .price(transaction.getPrice().toString())
