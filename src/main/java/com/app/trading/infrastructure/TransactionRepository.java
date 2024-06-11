@@ -28,4 +28,9 @@ public class TransactionRepository implements ITransactionRepository {
         TransactionEntity save = repository.save(entity);
         return TransactionEntity.toDomain(save);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        repository.deleteByUserId(userId.toString());
+    }
 }

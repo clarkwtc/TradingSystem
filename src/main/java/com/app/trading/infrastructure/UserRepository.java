@@ -7,7 +7,6 @@ import com.app.trading.infrastructure.jpa.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,12 +23,6 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public List<User> findALL() {
-        repository.findAll();
-        return List.of();
-    }
-
-    @Override
     public Optional<User> findById(UUID id) {
         Optional<UserEntity> entity = repository.findById(id.toString());
         return entity.map(UserEntity::toDomain);
@@ -43,6 +36,6 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public void deleteById(UUID id) {
-
+        repository.deleteById(id.toString());
     }
 }

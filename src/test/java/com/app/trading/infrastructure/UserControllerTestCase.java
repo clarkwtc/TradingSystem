@@ -143,4 +143,26 @@ public class UserControllerTestCase {
             Assertions.assertEquals(TransactionType.REWARD, transactionDTO.transactionType);
         }
     }
+
+    @Test
+    public void deleteUser() {
+        // Given
+        User user = new User("clark", "cc@gmail.com", UUID.randomUUID().toString());
+        userRepository.save(user);
+        transactionRepository.save(user.getId(), new Transaction(new BigDecimal(1), new BigDecimal(1000), Currency.USD, TransactionType.REWARD));
+
+        RequestSpecification request = given()
+                .pathParam("userId", user.getId().toString());
+
+        // When
+        Response response = request.when()
+                .delete("/api/users/{userId}");
+
+        // Then
+        response.then().statusCode(200);
+        Optional<User> optionalUser = userRepository.findById(user.getId());
+        Assertions.assertTrue(optionalUser.isEmpty());
+        List<Transaction> transactions = transactionRepository.findByUserId(user.getId());
+        Assertions.assertTrue(transactions.isEmpty());
+    }
 }

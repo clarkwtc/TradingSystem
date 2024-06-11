@@ -1,9 +1,11 @@
 package com.app.trading.infrastructure.endpoints;
 
 import com.app.trading.application.CreateUserUseCase;
+import com.app.trading.application.DeleteUserUseCase;
 import com.app.trading.application.TransactionHistoryUseCase;
 import com.app.trading.application.UserTransactionUseCase;
 import com.app.trading.application.parameters.CreateUserUseCaseParameter;
+import com.app.trading.application.parameters.DeleteUserParameter;
 import com.app.trading.application.parameters.TransactionHistoryParameter;
 import com.app.trading.application.parameters.UserTransactionParameter;
 import com.app.trading.domain.events.CreateUserEvent;;
@@ -29,6 +31,8 @@ public class UserController {
     UserTransactionUseCase userTransactionUseCase;
     @Autowired
     TransactionHistoryUseCase transactionHistoryUseCase;
+    @Autowired
+    DeleteUserUseCase deleteUserUseCase;
 
     @Getter
     @Setter
@@ -64,5 +68,12 @@ public class UserController {
         TransactionHistoryParameter transactionHistoryParameter = new TransactionHistoryParameter(UUID.fromString(id));
         TransactionHistoryEvent event = transactionHistoryUseCase.execute(transactionHistoryParameter);
         return new ResponseEntity<>(TransactionHistoryDTO.toDTO(event), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable String id){
+        DeleteUserParameter deleteUserParameter = new DeleteUserParameter(UUID.fromString(id));
+        deleteUserUseCase.execute(deleteUserParameter);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

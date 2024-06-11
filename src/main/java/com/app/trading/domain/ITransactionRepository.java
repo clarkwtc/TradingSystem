@@ -6,4 +6,5 @@ import java.util.UUID;
 public interface ITransactionRepository {
     List<Transaction> findByUserId(UUID userId);
     Transaction save(UUID userId, Transaction transaction);
+    void deleteByUserId(UUID userId);
 }
