@@ -1,5 +1,7 @@
 package com.app.trading.domain;
 
+import com.app.trading.domain.exceptions.InsufficientBalanceException;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -113,22 +115,26 @@ public class User {
     public void buy(BigDecimal amount){
         BigDecimal marketPrice = tradingSystem.getPricingSystem().getLatestPrice();
         BigDecimal totalValue = marketPrice.multiply(amount);
-        if (balances.containsKey(Currency.USD) && balances.get(Currency.USD).compareTo(totalValue) != -1){
+        if (balances.containsKey(Currency.USD) && balances.get(Currency.USD).compareTo(totalValue) != -1 && balances.get(Currency.USD).compareTo(BigDecimal.ZERO) > 0){
             transaction(marketPrice, amount, Currency.BTC, TransactionType.BUY);
 
             addBalance(Currency.BTC, marketPrice, amount);
             subBalance(Currency.USD, new BigDecimal("1.0"), totalValue);
+            return;
         }
+        throw new InsufficientBalanceException("User has not enough balance for %s.".formatted(Currency.USD));
     }
 
     public void sell(BigDecimal amount){
         BigDecimal marketPrice = tradingSystem.getPricingSystem().getLatestPrice();
         BigDecimal totalValue = marketPrice.multiply(amount);
-        if (balances.containsKey(Currency.BTC) && balances.get(Currency.BTC).compareTo(totalValue) != -1){
+        if (balances.containsKey(Currency.BTC) && balances.get(Currency.BTC).compareTo(totalValue) != -1 && balances.get(Currency.BTC).compareTo(BigDecimal.ZERO) > 0){
             transaction(marketPrice, amount, Currency.BTC, TransactionType.SELL);
 
             addBalance(Currency.USD, new BigDecimal("1.0"), totalValue);
             subBalance(Currency.BTC, marketPrice, amount);
+            return;
         }
+        throw new InsufficientBalanceException("User has not enough balance %s.".formatted(Currency.BTC));
     }
 }

@@ -85,7 +85,36 @@ public class UserControllerTestCase {
         Assertions.assertEquals(name, user.getName());
         Assertions.assertEquals(email, user.getEmail());
         Assertions.assertEquals(address, user.getAddress());
-        Assertions.assertEquals(new BigDecimal("1000.000"), user.getBalances(Currency.USD));
+        Assertions.assertEquals(new BigDecimal("1000.00"), user.getBalances(Currency.USD).setScale(2, RoundingMode.HALF_UP));
+    }
+
+    @Test
+    public void createDuplicatedUserFail() {
+        // Given
+        String address = String.valueOf(UUID.randomUUID());
+        userRepository.save(new User("clark", "cc@gamil.com", address));
+
+        String name = "clark";
+        String email = "cc@gmail.com";
+
+        RequestSpecification request = given()
+                .contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "name": "%s",
+                            "email": "%s",
+                            "address": "%s"
+                        }
+                        """.formatted(name, email, address));
+
+        // When
+        Response response = request.when()
+                .post("/api/users");
+
+        // Then
+        String result = response.then().statusCode(409)
+                .extract().body().asString();
+        Assertions.assertEquals("Username is exists", result);
     }
 
     @Test
@@ -93,8 +122,7 @@ public class UserControllerTestCase {
         // Given
         User user = new User("clark", "cc@gmail.com", UUID.randomUUID().toString());
         userRepository.save(user);
-        transactionRepository.save(user.getId(), new Transaction(new BigDecimal(1), new BigDecimal(1000), Currency.USD, TransactionType.REWARD));
-
+        transactionRepository.save(user.getId(), new Transaction(new BigDecimal(1), new BigDecimal("1000.00"), Currency.USD, TransactionType.REWARD));
 
         RequestSpecification request = given()
                 .pathParam("userId", user.getId().toString())
@@ -116,15 +144,13 @@ public class UserControllerTestCase {
         user.setTransactionHistory(transactions);
         Assertions.assertEquals(2, transactions.size());
         Assertions.assertEquals(new BigDecimal("900.00"), user.getBalances(Currency.USD).setScale(2, RoundingMode.HALF_UP));
-        Assertions.assertEquals(new BigDecimal("100.00"), user.getBalances(Currency.BTC));
+        Assertions.assertEquals(new BigDecimal("100.00"), user.getBalances(Currency.BTC).setScale(2, RoundingMode.HALF_UP));
     }
 
     @Test
-    public void transactionHistory() {
+    public void transactionHistoryWhenIsNotExistUser() {
         // Given
         User user = new User("clark", "cc@gmail.com", UUID.randomUUID().toString());
-        userRepository.save(user);
-        transactionRepository.save(user.getId(), new Transaction(new BigDecimal(1), new BigDecimal(1000), Currency.USD, TransactionType.REWARD));
 
         RequestSpecification request = given()
                 .pathParam("userId", user.getId().toString());
@@ -134,15 +160,8 @@ public class UserControllerTestCase {
                 .get("/api/users/{userId}/transactionHistory");
 
         // Then
-        response.then().statusCode(200);
-        TransactionHistoryDTO transactionHistoryDTO = response.body().as(TransactionHistoryDTO.class);
-        Assertions.assertEquals(1, transactionHistoryDTO.transactions.size());
-        for (TransactionDTO transactionDTO : transactionHistoryDTO.transactions) {
-            Assertions.assertEquals(new BigDecimal("1.00"), transactionDTO.price);
-            Assertions.assertEquals(new BigDecimal("1000.00"), transactionDTO.value);
-            Assertions.assertEquals(Currency.USD, transactionDTO.currency);
-            Assertions.assertEquals(TransactionType.REWARD, transactionDTO.transactionType);
-        }
+        String message = response.then().statusCode(404).extract().body().asString();
+        Assertions.assertEquals("User is not exists", message);
     }
 
     @Test
@@ -165,5 +184,22 @@ public class UserControllerTestCase {
         Assertions.assertTrue(optionalUser.isEmpty());
         List<Transaction> transactions = transactionRepository.findByUserId(user.getId());
         Assertions.assertTrue(transactions.isEmpty());
+    }
+
+    @Test
+    public void deleteUserWhenIsNotExistUser() {
+        // Given
+        User user = new User("clark", "cc@gmail.com", UUID.randomUUID().toString());
+
+        RequestSpecification request = given()
+                .pathParam("userId", user.getId().toString());
+
+        // When
+        Response response = request.when()
+                .delete("/api/users/{userId}");
+
+        // Then
+        String message = response.then().statusCode(404).extract().body().asString();
+        Assertions.assertEquals("User is not exists", message);
     }
 }

@@ -37,7 +37,7 @@ public class TradingSystem {
         user.deposit(new BigDecimal("1.0"), new BigDecimal("1000.0"), Currency.USD, TransactionType.REWARD);
     }
 
-    public void deleteUser(String address){
-        users.stream().filter(user -> user.getAddress().equals(address)).findFirst().ifPresent(users::remove);
+    public void deleteUser(String id){
+        users.stream().filter(user -> user.getId().toString().equals(id)).findFirst().ifPresent(users::remove);
     }
 }

@@ -1,5 +1,6 @@
 package com.app.trading.domain;
 
+import com.app.trading.domain.exceptions.InsufficientBalanceException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ public class UserTestCase {
         BigDecimal amount = new BigDecimal(11);
 
         // When
-        user.buy(amount);
+        Assertions.assertThrows(InsufficientBalanceException.class, () -> user.buy(amount));
 
         // Then
         Assertions.assertEquals(new BigDecimal("1000.00"), user.getBalances(Currency.USD));
@@ -82,7 +83,7 @@ public class UserTestCase {
         BigDecimal amount = new BigDecimal(2);
 
         // When
-        user.sell(amount);
+        Assertions.assertThrows(InsufficientBalanceException.class, () -> user.sell(amount));
 
         // Then
         Assertions.assertEquals(new BigDecimal("1000.00"), user.getBalances(Currency.USD));

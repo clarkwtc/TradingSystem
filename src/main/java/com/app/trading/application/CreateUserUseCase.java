@@ -1,5 +1,6 @@
 package com.app.trading.application;
 
+import com.app.trading.application.exceptions.DuplicatedUserException;
 import com.app.trading.application.parameters.CreateUserUseCaseParameter;
 import com.app.trading.domain.IUseCase;
 import com.app.trading.domain.TradingSystem;
@@ -8,6 +9,7 @@ import com.app.trading.domain.events.CreateUserEvent;
 import com.app.trading.infrastructure.StartupTimeBean;
 import com.app.trading.infrastructure.TransactionRepository;
 import com.app.trading.infrastructure.UserRepository;
+import com.sun.jdi.request.DuplicateRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,11 @@ public class CreateUserUseCase implements IUseCase<CreateUserUseCaseParameter, C
     @Override
     public CreateUserEvent execute(CreateUserUseCaseParameter parameter) {
         Optional<User> userData = userRepository.findByAddress(parameter.address());
-        User user = userData.orElseGet(() -> saveUser(parameter));
+        if (userData.isPresent()){
+            throw new DuplicatedUserException();
+        }
+
+        User user = saveUser(parameter);
         return new CreateUserEvent(user);
     }
 

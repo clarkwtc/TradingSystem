@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -24,6 +25,7 @@ public class TransactionCollection {
     private String amount;
     private String currency;
     private String type;
+    private long createdAt;
 
     public static Transaction toDomain(TransactionCollection collection){
         return new Transaction(new BigDecimal(collection.getPrice()), new BigDecimal(collection.getAmount()), Currency.valueOf(collection.getCurrency()), TransactionType.valueOf(collection.getType()));
@@ -37,6 +39,7 @@ public class TransactionCollection {
                 .amount(transaction.getValue().toString())
                 .currency(transaction.getCurrency().toString())
                 .type(transaction.getTransactionType().toString())
+                .createdAt(new Date().getTime())
                 .build();
     }
 }

@@ -38,6 +38,7 @@ public class TradingSystemTestCase {
     @Test
     public void deleteUser(){
         // Given
+
         String name = "clark";
         String email = "cc@gmail.com";
         String address = "TW";
@@ -45,7 +46,7 @@ public class TradingSystemTestCase {
         User user = tradingSystem.getUsers().get(0);
 
         // When
-        tradingSystem.deleteUser(user.getAddress());
+        tradingSystem.deleteUser(user.getId().toString());
 
         // Then
         Assertions.assertEquals(0, tradingSystem.getUsers().size());

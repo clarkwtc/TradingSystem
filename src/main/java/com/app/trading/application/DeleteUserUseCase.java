@@ -1,5 +1,6 @@
 package com.app.trading.application;
 
+import com.app.trading.application.exceptions.NotExistUserException;
 import com.app.trading.application.parameters.DeleteUserParameter;
 import com.app.trading.domain.IUseCase;
 import com.app.trading.domain.User;
@@ -25,7 +26,7 @@ public class DeleteUserUseCase implements IUseCase<DeleteUserParameter, DeleteUs
         UUID userId = parameter.userId();
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()){
-            throw new RuntimeException();
+            throw new NotExistUserException();
         }
 
         userRepository.deleteById(userId);

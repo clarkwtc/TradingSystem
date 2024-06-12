@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 public class PricingAlgorithm {
-    private final BigDecimal starting_price;
+    private final BigDecimal startingPrice;
     private final Currency currency;
     private final long startupTime;
     private static final BigDecimal DYNAMIC_PRICE = BigDecimal.valueOf(10.0);
@@ -17,8 +17,8 @@ public class PricingAlgorithm {
     private static final int CONTINUOUS_MINUTES = 3;
     private static final BigDecimal MAX_PRICE = new BigDecimal(SECOND_PER * CONTINUOUS_MINUTES / DYNAMIC_SECONDS).multiply(DYNAMIC_PRICE);
 
-    public PricingAlgorithm(BigDecimal starting_price, Currency currency, LocalDateTime startupTime) {
-        this.starting_price = starting_price;
+    public PricingAlgorithm(BigDecimal startingPrice, Currency currency, LocalDateTime startupTime) {
+        this.startingPrice = startingPrice;
         this.currency = currency;
         this.startupTime = toLong(startupTime);
     }
@@ -39,6 +39,7 @@ public class PricingAlgorithm {
         int pastTime = pricePeriod * SECOND_PER + seconds;
         return pricePeriod <= CONTINUOUS_MINUTES? increasePrices(pastTime): decreasePrices(pastTime);
     }
+
     private Duration getDiffDuration(){
         LocalDateTime lastTime = toLocalDateTime(startupTime);
         LocalDateTime now = LocalDateTime.now();
@@ -51,11 +52,11 @@ public class PricingAlgorithm {
 
     private BigDecimal increasePrices(int pastTime){
         BigDecimal changedPrice = new BigDecimal(pastTime / DYNAMIC_SECONDS).multiply(DYNAMIC_PRICE);
-        return starting_price.add(changedPrice);
+        return startingPrice.add(changedPrice);
     }
 
     private BigDecimal decreasePrices(int pastTime){
         BigDecimal changedPrice = new BigDecimal(pastTime / DYNAMIC_SECONDS).multiply(DYNAMIC_PRICE);
-        return starting_price.add(MAX_PRICE.multiply(new BigDecimal(2)).subtract(changedPrice));
+        return startingPrice.add(MAX_PRICE.multiply(new BigDecimal(2)).subtract(changedPrice));
     }
 }

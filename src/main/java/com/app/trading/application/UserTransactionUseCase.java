@@ -1,5 +1,6 @@
 package com.app.trading.application;
 
+import com.app.trading.application.exceptions.NotExistUserException;
 import com.app.trading.application.parameters.UserTransactionParameter;
 import com.app.trading.domain.*;
 import com.app.trading.domain.events.TransactionEvent;
@@ -46,10 +47,11 @@ public class UserTransactionUseCase implements IUseCase<UserTransactionParameter
 
     private User findUser(UUID userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
-        List<Transaction> transactions = transactionRepository.findByUserId(userId);
         if (optionalUser.isEmpty()){
-            throw new RuntimeException();
+            throw new NotExistUserException();
         }
+
+        List<Transaction> transactions = transactionRepository.findByUserId(userId);
 
         TradingSystem tradingSystem = new TradingSystem(startupTimeBean.getStartupTime());
         tradingSystem.addUser(optionalUser.get());
