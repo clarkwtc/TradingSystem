@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     image: trading-system
+    container_name: trading_system
     build:
       context: .
     ports:
@@ -18,6 +19,7 @@ services:
 
   postgres:
     image: postgres:16
+    container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: test159
@@ -29,6 +31,7 @@ services:
 
   mongo:
     image: mongo:5.0.27
+    container_name: mongo
     ports:
       - "27017:27017"
     volumes:
